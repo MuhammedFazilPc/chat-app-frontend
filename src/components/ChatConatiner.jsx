@@ -5,7 +5,9 @@ import Input from './Input';
 import { getAllMessagesRoute } from '../utils/APIroutes';
 import axios from 'axios'
 import { io } from 'socket.io-client'
-const socket = io ('http://localhost:5000')
+import {host} from "../utils/APIroutes"
+// const socket = io ('http://localhost:5000')
+const socket = io (host)
 function ChatContainer({ currentChat, user }) {
     const [currentChatMessages, setcurrentChatMessages] = useState([]);
     const navigate = useNavigate()
@@ -52,11 +54,13 @@ function ChatContainer({ currentChat, user }) {
 
     const handleDataToSend = (msg) => {
         console.log("message to send is :", msg)
-        socket.emit("send_message", {
-            msg,
-            sender: user._id,
-            to: currentChat._id,
-        })
+        if(msg.length>0){
+            socket.emit("send_message", {
+                msg,
+                sender: user._id,
+                to: currentChat._id,
+            })
+        }
     }
     return (
         <Container>

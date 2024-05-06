@@ -1,57 +1,68 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {IoMdSend} from 'react-icons/io'
-import {BsEmojiSmileFill} from 'react-icons/bs';
-import Picker  from 'emoji-picker-react' ;
+import { IoMdSend } from 'react-icons/io'
+import { BsEmojiSmileFill } from 'react-icons/bs';
+import Picker from 'emoji-picker-react';
 import axios from "axios"
 import { sendMessageRoute } from '../utils/APIroutes';
-function Input({currentChat,user,dataToSend}) {
+function Input({ currentChat, user, dataToSend }) {
   // console.log("current chat and user is ",currentChat," ",user)
   const [emojiSelected, setemojiSelected] = useState(false);
   const [msg, setmsg] = useState("");
-  const handleEmojiSelecter=()=>{
-      setemojiSelected(!emojiSelected)
+  const handleEmojiSelecter = () => {
+    setemojiSelected(!emojiSelected)
   }
-  const handleEmojiClick=(emojiData,event)=>{
-  //  console.log(emojiData.emoji)
-    let message=msg;
-    message+=emojiData.emoji;
+  const handleEmojiClick = (emojiData, event) => {
+    //  console.log(emojiData.emoji)
+    let message = msg;
+    message += emojiData.emoji;
     setmsg(message)
   }
-  
-  const handleSendClick=async(event)=>{
+
+  const handleSendClick = async (event) => {
     event.preventDefault();
+    if(emojiSelected){
+      setemojiSelected(!emojiSelected)
+    }
     dataToSend(msg)
     axios.post(sendMessageRoute, {
-      message:msg,
-      users:[currentChat._id,user._id],
-      sender:user._id
+      message: msg,
+      users: [currentChat._id, user._id],
+      sender: user._id
     })
-    .then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     setmsg("")
   }
   return (
     <Container>
-      <div className="input-div">
-        <BsEmojiSmileFill onClick={handleEmojiSelecter} />
-         <div className="emoji-picker-react">
-         {emojiSelected && <Picker onEmojiClick={handleEmojiClick}/>}
-         </div>
-        <input type="text" placeholder=' Type a message' value={msg} onChange={(event)=>{setmsg(event.target.value)}} autoFocus/>
-        <IoMdSend onClick={handleSendClick}/>
-      </div>
+      <form onSubmit={handleSendClick}>
+        <div className="input-div">
+          <BsEmojiSmileFill onClick={handleEmojiSelecter} />
+          <div className="emoji-picker-react">
+            {emojiSelected && <Picker onEmojiClick={handleEmojiClick} />}
+          </div>
+          <input type="text" placeholder=' Type a message' value={msg} onChange={(event) => { setmsg(event.target.value) }} autoFocus />
+          <IoMdSend onClick={handleSendClick} />
+        </div>
+        <button type="submit" style={{ display: 'none' }}>Submit</button>
+      </form>
+
     </Container>
   );
 }
 const Container = styled.div`
 height:100%;
-   .input-div{
-        flex: 1; /* Fill remaining space */
+   form{
+    flex: 1;
+    width: 100%;
+    height:100%;
+    .input-div{
+         /* Fill remaining space */
         width: 100%;
         height:100%;
         background-color: #4d4545a3;
@@ -78,5 +89,6 @@ height:100%;
         top:100px;
         }
     }
+   }
 `;
 export default Input;
